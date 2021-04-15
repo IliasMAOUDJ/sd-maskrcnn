@@ -28,7 +28,7 @@ import skimage
 import numpy as np
 
 from .utils import mkdir_if_missing
-from mrcnn import model as modellib, visualize, utils as utilslib
+from maskrcnn.mrcnn import model as modellib, visualize, utils as utilslib
 
 def s_benchmark(run_dir, dataset_real, inference_config, pred_mask_dir, pred_info_dir, \
                 vis_missed=False):
@@ -58,7 +58,7 @@ def s_benchmark(run_dir, dataset_real, inference_config, pred_mask_dir, pred_inf
                                                                         use_mini_mask=False)
         gt_stat, stat_name = compute_gt_stats(gt_bbox, gt_mask)
 
-        r = np.load(os.path.join(pred_info_dir, 'image_{:06}.npy'.format(image_id))).item()
+        r = np.load(os.path.join(pred_info_dir, 'image_{:06}.npy'.format(image_id)),allow_pickle=True).item()
         r_masks = np.load(os.path.join(pred_mask_dir, 'image_{:06}.npy'.format(image_id)))
         # Must transpose from (n, h, w) to (h, w, n)
         r['masks'] = np.transpose(r_masks, (1, 2, 0))
@@ -81,6 +81,7 @@ def s_benchmark(run_dir, dataset_real, inference_config, pred_mask_dir, pred_inf
             gt_stats.append(gt_stat)
 
         # Visualize missing objects
+        """
         fn_ind = ms[1][8][-1] # missing objects at threshold 0.5
         if fn_ind.size > 0:
             _, _, axes = subplot(plt, (fn_ind.size+1, 1), sz_y_sz_x=(5,5))
@@ -96,7 +97,7 @@ def s_benchmark(run_dir, dataset_real, inference_config, pred_mask_dir, pred_inf
                                      'vis_{:06d}.png'.format(dataset_real.image_id[image_id]))
             plt.savefig(file_name, bbox_inches='tight', pad_inches=0)
             plt.close()
-
+        """
     print('Computing AP and plotting PR curves...')
     # Compute AP
     for tps, fps, scs, num_insts, dup_dets, inst_ids, ovs, tp_inds, fn_inds, \

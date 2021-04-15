@@ -25,7 +25,7 @@ import os
 import skimage
 import numpy as np
 
-from mrcnn.utils import Dataset
+from maskrcnn.mrcnn.utils import Dataset
 
 """
 ImageDataset creates a Matterport dataset for a directory of
@@ -48,22 +48,24 @@ $base_path/
 class ImageDataset(Dataset):
     def __init__(self, config):
         assert config['dataset']['path'] != "", "You must provide the path to a dataset!"
-
+        super().__init__()
         self.dataset_config = config['dataset']
         self.base_path = config['dataset']['path']
         self.images = config['dataset']['images']
+        self.labels = config['dataset']['labels']
         self.masks = config['dataset']['masks']
+        self.num_classes = config['dataset']['num_classes']
+        self.add_class('latim', 1, 'Femur')
+        self.add_class('latim', 2, 'Tibia')
 
         self._channels = config['model']['settings']['image_channel_count']
-        super().__init__()
+        
 
     def load(self, indices_file, augment=False):
 
         # Load the indices for imset.
         split_file = os.path.join(self.base_path, '{:s}'.format(indices_file))
         self.image_id = np.load(split_file)
-        self.add_class('clutter', 1, 'fg')
-
         flips = [1, 2, 3]
         for i in self.image_id:
             if 'numpy' in self.images:
@@ -72,11 +74,13 @@ class ImageDataset(Dataset):
             else:
                 p = os.path.join(self.base_path, self.images,
                                 'image_{:06d}.png'.format(i))
-            self.add_image('clutter', image_id=i, path=p)
+            labels = os.path.join(self.base_path, self.labels,
+                                'image_{:06d}.npy'.format(i))
+            self.add_image('latim', image_id=i, path=p, labels=labels)
 
             if augment:
                 for flip in flips:
-                    self.add_image('clutter', image_id=i, path=p, flip=flip)
+                    self.add_image('latim', image_id=i, path=p, flip=flip, labels=labels)
 
     def flip(self, image, flip):
         # flips during training for augmentation
@@ -113,7 +117,7 @@ class ImageDataset(Dataset):
 
     def image_reference(self, image_id):
         info = self.image_info[image_id]
-        if info["source"] == "clutter":
+        if info["source"] == "latim":
             return info["path"] + "-{:d}".format(info["flip"])
         else:
             super(self.__class__).image_reference(self, image_id)
@@ -121,6 +125,7 @@ class ImageDataset(Dataset):
     def load_mask(self, image_id):
         # loads mask from path
         info = self.image_info[image_id]
+        
         _image_id = info['id']
         Is = []
         file_name = os.path.join(self.base_path, self.masks,
@@ -137,7 +142,8 @@ class ImageDataset(Dataset):
         else:
             mask = np.zeros([info['height'], info['width'], 0], dtype=np.bool)
 
-        class_ids = np.array([1 for _ in range(mask.shape[2])])
+        labels = info['labels']
+        class_ids = np.load(labels)
         return mask, class_ids.astype(np.int32)
 
     @property

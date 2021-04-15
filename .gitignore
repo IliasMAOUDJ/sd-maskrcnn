@@ -9,3 +9,5 @@ build
 dist
 *_results
 datasets/
+*.h5
+latim_dataset/

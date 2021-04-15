@@ -1,26 +1,28 @@
 model:
   path: models/
-  weights: new     # new, last, coco, imagenet or custom path
+  weights: imagenet     # new, last, coco, imagenet or custom path
   epochs: 20       # number of epochs to train for
   settings:
-    name: my_model
+    name: latim_dataset
     image_shape: [512,512]
-    image_channel_count: 3
-    mean_pixel: [128, 128, 128]
-    backbone: resnet35
-    max_gt_instances: 20
+    image_channel_count: 1
+    mean_pixel: [128] #, 128, 128]
+    backbone: resnet50
+    max_gt_instances: 10
     gpu_count: 1
-    images_per_gpu: 5
+    images_per_gpu: 1
     learning_rate: 0.01
 
 dataset:
-  path: datasets/wisdom/wisdom-sim/
+  path: latim_dataset/images/
   train_indices: train_indices.npy
   val_indices: test_indices.npy
   images: depth_ims
-  masks: modal_segmasks
+  masks: semantic_masks
+  num_classes: 3
+  labels: labels
 
 # name of the config file to save (within the dataset folder)
 # note that this will be overwritten between multiple runs so
 # you should name this uniquely for each run.
-save_conf_name: config_1e-2_e20_res35.yaml
+save_conf_name: pretrained_res50.yaml

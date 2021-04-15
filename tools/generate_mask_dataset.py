@@ -34,8 +34,8 @@ import matplotlib.pyplot as plt
 
 from autolab_core import TensorDataset, YamlConfig, Logger
 import autolab_core.utils as utils
-from perception import DepthImage, GrayscaleImage, BinaryImage, ColorImage
-
+#from perception import DepthImage, GrayscaleImage, BinaryImage, ColorImage
+import perception
 from sd_maskrcnn.envs import BinHeapEnv
 from sd_maskrcnn.envs.constants import *
 
@@ -432,23 +432,23 @@ def generate_segmask_dataset(output_dataset_path, config, save_tensors=True, war
 
                     # Save depth image and semantic masks
                     if image_config['color']:
-                        ColorImage(color_obs).save(os.path.join(color_dir, 'image_{:06d}.png'.format(num_images_per_state*state_id + k)))
+                        perception.ColorImage(color_obs).save(os.path.join(color_dir, 'image_{:06d}.png'.format(num_images_per_state*state_id + k)))
                     if image_config['depth']:
-                        DepthImage(depth_obs).save(os.path.join(depth_dir, 'image_{:06d}.png'.format(num_images_per_state*state_id + k)))
+                        perception.DepthImage(depth_obs).save(os.path.join(depth_dir, 'image_{:06d}.png'.format(num_images_per_state*state_id + k)))
                     if image_config['modal']:
                         modal_id_dir = os.path.join(modal_dir, 'image_{:06d}'.format(num_images_per_state*state_id + k))
                         if not os.path.exists(modal_id_dir):
                             os.mkdir(modal_id_dir)
                         for i in range(env.num_objects):
-                            BinaryImage(modal_segmask_arr[:,:,i]).save(os.path.join(modal_id_dir, 'channel_{:03d}.png'.format(i)))
+                            perception.BinaryImage(modal_segmask_arr[:,:,i]).save(os.path.join(modal_id_dir, 'channel_{:03d}.png'.format(i)))
                     if image_config['amodal']:
                         amodal_id_dir = os.path.join(amodal_dir, 'image_{:06d}'.format(num_images_per_state*state_id + k))
                         if not os.path.exists(amodal_id_dir):
                             os.mkdir(amodal_id_dir)
                         for i in range(env.num_objects):
-                            BinaryImage(amodal_segmask_arr[:,:,i]).save(os.path.join(amodal_id_dir, 'channel_{:03d}.png'.format(i)))
+                            perception.BinaryImage(amodal_segmask_arr[:,:,i]).save(os.path.join(amodal_id_dir, 'channel_{:03d}.png'.format(i)))
                     if image_config['semantic']:
-                        GrayscaleImage(stacked_segmask_arr.squeeze()).save(os.path.join(semantic_dir, 'image_{:06d}.png'.format(num_images_per_state*state_id + k)))
+                        perception.GrayscaleImage(stacked_segmask_arr.squeeze()).save(os.path.join(semantic_dir, 'image_{:06d}.png'.format(num_images_per_state*state_id + k)))
                     
                     # Save split
                     if split == TRAIN_ID:

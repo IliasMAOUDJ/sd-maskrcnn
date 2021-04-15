@@ -1,0 +1,29 @@
+!!omap
+- model: !!omap
+  - path: models/
+  - weights: imagenet
+  - epochs: 5
+  - settings: !!omap
+    - name: latim_dataset
+    - image_shape:
+      - 512
+      - 512
+    - image_channel_count: 1
+    - mean_pixel:
+      - 128
+    - backbone: resnet50
+    - max_gt_instances: 10
+    - gpu_count: 1
+    - images_per_gpu: 4
+    - learning_rate: 0.01
+    - image_min_dim: 512
+    - image_max_dim: 512
+- dataset: !!omap
+  - path: latim_dataset/images/
+  - train_indices: train_indices.npy
+  - val_indices: test_indices.npy
+  - images: depth_ims
+  - masks: semantic_masks
+  - num_classes: 3
+  - labels: labels
+- save_conf_name: pretrained_res35.yaml

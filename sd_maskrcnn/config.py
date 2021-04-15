@@ -21,17 +21,17 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 Author: Mike Danielczuk
 """
 
-from mrcnn.config import Config
+from maskrcnn.mrcnn.config import Config
 
 class MaskConfig(Config):
   """Configuration for training SD Mask RCNN.
   Derives from the base Config class and overrides values specific
   to SD Mask RCNN.
   """
-  NAME = 'my_sdmaskrcnn'
+  NAME = 'latim'
 
   # Number of classes (including background)
-  NUM_CLASSES = 1 + 1  # background + object
+  NUM_CLASSES = 1 + 2  # background + object
   USE_MINI_MASK = False
 
   # Use smaller anchors because our image and objects are small

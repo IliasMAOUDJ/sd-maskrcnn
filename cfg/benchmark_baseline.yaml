@@ -22,9 +22,9 @@ detector:
   gop:
 
 dataset:
-  path: datasets/wisdom/wisdom-real/high-res
+  path: test
   images: depth_ims_numpy           # PCL methods require depth_ims_numpy, GOP requires color_ims
-  masks: modal_segmasks
+  masks: semantic_masks
   bin_masks: segmasks_filled        # Directory containing bin masks
   indices: test_indices.npy
 
