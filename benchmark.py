@@ -158,8 +158,7 @@ def detect(run_dir, inference_config, model, dataset, bin_mask_dir=False, overla
     for image_id in tqdm(image_ids):
         # Load image and ground truth data and resize for net
         image, _, _, _, gt_mask =\
-          modellib.load_image_gt(dataset, inference_config, image_id,
-            use_mini_mask=False)
+          modellib.load_image_gt(dataset, inference_config, image_id)
     
         # Run object detection
         results = model.detect([image], verbose=0)
@@ -238,7 +237,7 @@ def visualize_predictions(run_dir, dataset, inference_config, pred_mask_dir, pre
     print('VISUALIZING PREDICTIONS')
     for image_id in tqdm(image_ids):
         # Load image and ground truth data and resize for net
-        image, _, _, _, _ = modellib.load_image_gt(dataset, inference_config, image_id, use_mini_mask=False)
+        image, _, _, _, _ = modellib.load_image_gt(dataset, inference_config, image_id)
         if inference_config.IMAGE_CHANNEL_COUNT == 1:
             image = np.repeat(image, 3, axis=2)
         elif inference_config.IMAGE_CHANNEL_COUNT > 3:
@@ -275,8 +274,7 @@ def visualize_gts(run_dir, dataset, inference_config, show_bbox=True, show_score
     print('VISUALIZING GROUND TRUTHS')
     for image_id in tqdm(image_ids):
         # Load image and ground truth data and resize for net
-        image, _, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset, inference_config, image_id,
-                                                                        use_mini_mask=False)
+        image, _, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset, inference_config, image_id)
 
         if inference_config.IMAGE_CHANNEL_COUNT == 1:
             image = np.repeat(image, 3, axis=2)

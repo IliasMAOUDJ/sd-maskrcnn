@@ -57,22 +57,24 @@ def gen_semantic_data(path, scene, scene_number,resolution=[512,512]):
         # for each hit, find the distance along its vector
         depth = trimesh.util.diagonal_dot(points - origins[0],
                                         vectors[index_ray])
+
         # find pixel locations of actual hits
         pixel_ray = pixels[index_ray]
         # convert depth into 0 - 255 uint8
-        #depth_int = (depth * 255).round().astype(np.uint8)
+        depth_float = ((depth - depth.min()) / depth.ptp())
+        depth_int = (depth * 255).round().astype(np.uint8)
         
         e=0
         for (i,j) in pixel_ray:
-            if(depth[e] <= depth_map[i,j]):
+            if(depth_int[e] < depth_map[i,j]):
                 if("box" in geometry):
-                    semantic[i,j] = 0
+                    semantic[i,j] = 0               
                 else:
-                    semantic[i,j] = s                   
-                depth_map[i,j] = depth[e]
+                    semantic[i,j] = s*15                   
+                depth_map[i,j] = depth_int[e]
             e+=1
         s+=1
-    print(semantic)
+        
     # create a PIL image from the depth queries
     semantic_map = PIL.Image.fromarray(np.transpose(semantic))
     semantic_map = semantic_map.transpose(PIL.Image.FLIP_TOP_BOTTOM)
@@ -193,8 +195,8 @@ def rotz(t):
 
 if __name__ == '__main__':
     print("---------  Generating dummy scenes----------------")
-    nb_samples=5
-    dataset_path= "./dummy/images"
+    nb_samples=500
+    dataset_path= "./latim_dataset/images"
     train_inds = []
     test_inds = []
 

@@ -1,6 +1,6 @@
 model:
   path: models/
-  weights: imagenet     # new, last, coco, imagenet or custom path
+  weights: new     # new, last, coco, imagenet or custom path
   epochs: 20       # number of epochs to train for
   settings:
     name: latim_dataset
@@ -25,4 +25,4 @@ dataset:
 # name of the config file to save (within the dataset folder)
 # note that this will be overwritten between multiple runs so
 # you should name this uniquely for each run.
-save_conf_name: pretrained_res50.yaml
+save_conf_name: new_res50.yaml

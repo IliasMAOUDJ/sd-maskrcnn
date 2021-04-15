@@ -1,20 +1,20 @@
-output_dir: benchmark_results
+output_dir: benchmark_results/ON_GPU
 save_conf_name: config.yaml
 
 model:
-  path: models/labeled.h5
+  path: models/ON_GPU.h5
   mode: inference
   settings:
     image_shape: [512, 512]
     image_channel_count: 1
     mean_pixel: [128] #,128,128]
-    backbone: resnet35
+    backbone: resnet50
     post_nms_rois_inference: 2000
     rpn_nms_threshold: 1.0
     detection_nms_threshold: 0.35
 
 dataset:
-  path: tester/images
+  path: latim_dataset/images
   images: depth_ims
   masks: semantic_masks
   labels: labels
@@ -41,4 +41,4 @@ vis:
   show_class_gt: 1
 
   # Additional vis settings
-  s_bench: 1
+  s_bench: 0

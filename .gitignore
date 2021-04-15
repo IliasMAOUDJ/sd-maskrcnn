@@ -11,3 +11,4 @@ dist
 datasets/
 *.h5
 latim_dataset/
+dummy/

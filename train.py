@@ -106,7 +106,7 @@ def train(config):
                 epochs=config['model']['epochs'], layers='all')
 
     # save in the models folder
-    current_datetime = time.strftime("%Y%m%d-%H%M%S")
+    current_datetime = time.strftime("%d-%H%M")
     model_path = os.path.join(config['model']['path'], "mask_rcnn_{}_{}.h5".format(train_config.NAME, current_datetime))
     model.keras_model.save_weights(model_path)
 

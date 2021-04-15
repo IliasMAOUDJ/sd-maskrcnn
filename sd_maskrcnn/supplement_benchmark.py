@@ -54,8 +54,7 @@ def s_benchmark(run_dir, dataset_real, inference_config, pred_mask_dir, pred_inf
         # Load image and ground truth data
         image, _, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset_real,
                                                                         inference_config,
-                                                                        image_id,
-                                                                        use_mini_mask=False)
+                                                                        image_id)
         gt_stat, stat_name = compute_gt_stats(gt_bbox, gt_mask)
 
         r = np.load(os.path.join(pred_info_dir, 'image_{:06}.npy'.format(image_id)),allow_pickle=True).item()
