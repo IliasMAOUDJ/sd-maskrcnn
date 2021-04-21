@@ -1,28 +1,28 @@
 model:
   path: models/
   weights: new     # new, last, coco, imagenet or custom path
-  epochs: 20       # number of epochs to train for
+  epochs: [3] #, 5, 7]      # number of epochs to train for
   settings:
-    name: latim_dataset
+    name: test
     image_shape: [512,512]
     image_channel_count: 1
-    mean_pixel: [128] #, 128, 128]
+    mean_pixel: [171] #, 128, 128]
     backbone: resnet50
-    max_gt_instances: 10
+    max_gt_instances: 8
     gpu_count: 1
     images_per_gpu: 1
-    learning_rate: 0.01
+    learning_rate: [0.01] #, 0.001,0.0001]
+    layers: all
 
 dataset:
-  path: latim_dataset/images/
+  path: tester/images/
   train_indices: train_indices.npy
   val_indices: test_indices.npy
   images: depth_ims
   masks: semantic_masks
-  num_classes: 3
   labels: labels
 
 # name of the config file to save (within the dataset folder)
 # note that this will be overwritten between multiple runs so
 # you should name this uniquely for each run.
-save_conf_name: new_res50.yaml
+save_conf_name: multistep.yaml

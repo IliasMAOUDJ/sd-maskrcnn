@@ -62,11 +62,10 @@ def encode_gt(mask_dir):
     }
 
     N = len(fnmatch.filter(os.listdir(mask_dir), 'image_*.npy'))
-
     for i in range(N):
         # load image
         im_name = 'image_{:06d}.npy'.format(i)
-        I = np.load(os.path.join(mask_dir, im_name), allow_pickle=True)
+        I = np.load(os.path.join(mask_dir, im_name))
         im_anno = {
             'id': i,
             'width': int(I.shape[1]),
@@ -132,13 +131,12 @@ def encode_predictions(mask_dir, info_dir):
     annos = []
 
     N = len(fnmatch.filter(os.listdir(mask_dir), 'image_*.npy'))
-
+    print(N)
     for i in range(N):
         # load .npy
         im_name = 'image_{:06d}.npy'.format(i)
         I = np.load(os.path.join(mask_dir, im_name), allow_pickle=True)
         info = np.load(os.path.join(info_dir, im_name), allow_pickle=True).item()
-
         for j,bin_mask in enumerate(I):
             # encode mask
             encode_mask = mask.encode(np.asfortranarray(bin_mask.astype(np.uint8)))

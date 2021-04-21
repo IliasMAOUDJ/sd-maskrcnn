@@ -38,7 +38,7 @@ import skimage.io as io
 from copy import copy
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.python.keras.backend import set_session
+from keras.backend.tensorflow_backend import set_session
 
 from autolab_core import YamlConfig
 
@@ -83,9 +83,9 @@ def benchmark(config):
     test_dataset.prepare()
 
     vis_config = copy(config)
-    vis_config['dataset']['images'] = 'depth_ims'
-    vis_config['dataset']['masks'] = 'semantic_masks'
-    vis_config['dataset']['labels'] = 'labels'
+    vis_config['dataset']['images'] =  config['dataset']['images']
+    vis_config['dataset']['masks'] = config['dataset']['masks']
+    vis_config['dataset']['labels'] = config['dataset']['labels']
     vis_dataset = ImageDataset(config)
     vis_dataset.load(config['dataset']['indices'])
     vis_dataset.prepare()
@@ -113,8 +113,8 @@ def benchmark(config):
                               show_bbox=config['vis']['show_bbox_pred'], show_scores=config['vis']['show_scores_pred'], show_class=config['vis']['show_class_pred'])
     if config['vis']['ground_truth']:
         visualize_gts(config['output_dir'], vis_dataset, inference_config, show_scores=False, show_bbox=config['vis']['show_bbox_gt'], show_class=config['vis']['show_class_gt'])
-    if config['vis']['s_bench']:
-        s_benchmark(config['output_dir'], vis_dataset, inference_config, pred_mask_dir, pred_info_dir)
+    #if config['vis']['s_bench']:
+    #    s_benchmark(config['output_dir'], vis_dataset, inference_config, pred_mask_dir, pred_info_dir)
 
     print("Saved benchmarking output to {}.\n".format(config['output_dir']))
     return ap, ar
@@ -164,39 +164,6 @@ def detect(run_dir, inference_config, model, dataset, bin_mask_dir=False, overla
         results = model.detect([image], verbose=0)
         r = results[0]
         times.append(r['time'])
-
-        # If we choose to mask out bin pixels, load the bin masks and
-        # transform them properly.
-        # Then, delete the mask, score, class id, and bbox corresponding
-        # to each mask that is entirely bin pixels.
-        if bin_mask_dir:
-            name = 'image_{:06d}.png'.format(indices[image_id])
-            bin_mask = io.imread(os.path.join(bin_mask_dir, name))[:,:,np.newaxis]
-            bin_mask, _, _, _, _ = utilslib.resize_image(
-                bin_mask,
-                max_dim=inference_config.IMAGE_MAX_DIM,
-                min_dim=inference_config.IMAGE_MIN_DIM,
-                mode=inference_config.IMAGE_RESIZE_MODE
-            )
-
-            bin_mask = bin_mask.squeeze()
-            deleted_masks = [] # which segmasks are gonna be tossed?
-            num_detects = r['masks'].shape[2]
-            for k in range(num_detects):
-                # compute the area of the overlap.
-                inter = np.logical_and(bin_mask, r['masks'][:,:,k])
-                frac_overlap =  np.sum(inter) / np.sum(r['masks'][:,:,k])
-                if frac_overlap <= overlap_thresh:
-                    deleted_masks.append(k)
-
-            r['masks'] = [r['masks'][:,:,k] for k in range(num_detects) if k not in deleted_masks]
-            r['masks'] = np.stack(r['masks'], axis=2) if r['masks'] else np.array([])
-            r['rois'] = [r['rois'][k,:] for k in range(num_detects) if k not in deleted_masks]
-            r['rois'] = np.stack(r['rois'], axis=0) if r['rois'] else np.array([])
-            r['class_ids'] = np.array([r['class_ids'][k] for k in range(num_detects)
-                                       if k not in deleted_masks])
-            r['scores'] = np.array([r['scores'][k] for k in range(num_detects)
-                                       if k not in deleted_masks])
 
         # Save copy of transformed GT segmasks to disk in preparation for annotations
         mask_name = 'image_{:06d}'.format(image_id)

@@ -1,24 +1,23 @@
-output_dir: benchmark_results/ON_GPU
+output_dir: benchmark_results/tester3
 save_conf_name: config.yaml
 
 model:
-  path: models/ON_GPU.h5
+  path: models/HighLR.h5
   mode: inference
   settings:
     image_shape: [512, 512]
     image_channel_count: 1
-    mean_pixel: [128] #,128,128]
+    mean_pixel: [171] #,128,128]
     backbone: resnet50
-    post_nms_rois_inference: 2000
+    post_nms_rois_inference: 800
     rpn_nms_threshold: 1.0
     detection_nms_threshold: 0.35
 
 dataset:
-  path: latim_dataset/images
+  path: latim_500/images
   images: depth_ims
   masks: semantic_masks
   labels: labels
-  num_classes: 3
   indices: test_indices.npy
 
 mask:                                                                                                                                                              
@@ -30,13 +29,13 @@ mask:
 vis:
   # Prediction vis settings
   predictions: 1
-  show_bbox_pred: 1
+  show_bbox_pred: 0
   show_scores_pred: 0
   show_class_pred: 1
 
   # GT vis settings
   ground_truth: 1
-  show_bbox_gt: 1
+  show_bbox_gt: 0
   show_scores_gt: 0
   show_class_gt: 1
 

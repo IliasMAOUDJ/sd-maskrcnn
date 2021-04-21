@@ -102,11 +102,17 @@ def train(config):
     config.save(os.path.join(config['model']['path'], config['save_conf_name']))
 
     # train and save weights to model_path
-    model.train(dataset_train, dataset_val, learning_rate=train_config.LEARNING_RATE,
-                epochs=config['model']['epochs'], layers='all')
+    model.train(dataset_train, dataset_val, learning_rate=config['model']['settings']['learning_rate'][0],
+                epochs=config['model']['epochs'][0], layers=config['model']['settings']['layers'])
+
+    #model.train(dataset_train, dataset_val, learning_rate=config['model']['settings']['learning_rate'][1],
+    #            epochs=config['model']['epochs'][1], layers=config['model']['settings']['layers'])
+
+    #model.train(dataset_train, dataset_val, learning_rate=config['model']['settings']['learning_rate'][2],
+    #            epochs=config['model']['epochs'][2], layers=config['model']['settings']['layers'])
 
     # save in the models folder
-    current_datetime = time.strftime("%d-%H%M")
+    current_datetime = time.strftime("%H%M")
     model_path = os.path.join(config['model']['path'], "mask_rcnn_{}_{}.h5".format(train_config.NAME, current_datetime))
     model.keras_model.save_weights(model_path)
 

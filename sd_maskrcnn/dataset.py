@@ -54,7 +54,7 @@ class ImageDataset(Dataset):
         self.images = config['dataset']['images']
         self.labels = config['dataset']['labels']
         self.masks = config['dataset']['masks']
-        self.num_classes = config['dataset']['num_classes']
+        #self.num_classes = config['dataset']['num_classes']
         self.add_class('latim', 1, 'Femur')
         self.add_class('latim', 2, 'Tibia')
 

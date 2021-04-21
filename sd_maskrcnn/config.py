@@ -35,7 +35,7 @@ class MaskConfig(Config):
   USE_MINI_MASK = False
 
   # Use smaller anchors because our image and objects are small
-  # RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  # anchor side in pixels
+  RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  # anchor side in pixels
 
   def __init__(self, config):
     # Overriding things here.
