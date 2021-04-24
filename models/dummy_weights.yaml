@@ -1,0 +1,37 @@
+!!omap
+- model: !!omap
+  - path: models/
+  - weights: new
+  - epochs:
+    - 30
+  - settings: !!omap
+    - name: dummy_new
+    - image_shape:
+      - 512
+      - 512
+    - image_channel_count: 1
+    - mean_pixel:
+      - 237
+    - backbone: resnet50
+    - max_gt_instances: 5
+    - gpu_count: 1
+    - images_per_gpu: 1
+    - learning_rate:
+      - 0.002
+    - layers: all
+    - loss_weights: !!omap
+      - rpn_class_loss: 5.0
+      - rpn_bbox_loss: 1.0
+      - mrcnn_class_loss: 5.0
+      - mrcnn_bbox_loss: 3.0
+      - mrcnn_mask_loss: 1.0
+    - image_min_dim: 512
+    - image_max_dim: 512
+- dataset: !!omap
+  - path: /home/ilias-m/Documents/DATASETS/LATIM/dataset/
+  - train_indices: train_indices.npy
+  - val_indices: val_indices.npy
+  - images: depth_ims
+  - masks: semantic_masks
+  - labels: labels
+- save_conf_name: dummy_weights.yaml

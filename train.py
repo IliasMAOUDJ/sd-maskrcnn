@@ -55,7 +55,7 @@ def train(config):
     config['model']['settings']['image_max_dim'] = max(image_shape)
     train_config = MaskConfig(config['model']['settings'])
     train_config.STEPS_PER_EPOCH = dataset_train.indices.size/(train_config.IMAGES_PER_GPU*train_config.GPU_COUNT)
-    #train_config.display()
+    train_config.display()
 
     # Create directory if it doesn't currently exist
     utils.mkdir_if_missing(config['model']['path'])
@@ -104,7 +104,8 @@ def train(config):
     # train and save weights to model_path
     model.train(dataset_train, dataset_val, learning_rate=config['model']['settings']['learning_rate'][0],
                 epochs=config['model']['epochs'][0], layers=config['model']['settings']['layers'])
-
+    #model.train(dataset_train, dataset_val, learning_rate=config['model']['settings']['learning_rate'][0]/10,
+    #            epochs=config['model']['epochs'][0]*2, layers=config['model']['settings']['layers'])
     #model.train(dataset_train, dataset_val, learning_rate=config['model']['settings']['learning_rate'][1],
     #            epochs=config['model']['epochs'][1], layers=config['model']['settings']['layers'])
 

@@ -1,27 +1,27 @@
-output_dir: benchmark_results/tester3
+output_dir: benchmark_results/dummy_white_bg
 save_conf_name: config.yaml
 
 model:
-  path: models/HighLR.h5
+  path: models/no_bg_best.h5
   mode: inference
   settings:
     image_shape: [512, 512]
     image_channel_count: 1
-    mean_pixel: [171] #,128,128]
+    mean_pixel: [237] #,128,128]
     backbone: resnet50
     post_nms_rois_inference: 800
     rpn_nms_threshold: 1.0
     detection_nms_threshold: 0.35
 
 dataset:
-  path: latim_500/images
+  path: dummy/images
   images: depth_ims
   masks: semantic_masks
   labels: labels
   indices: test_indices.npy
 
 mask:                                                                                                                                                              
-  remove_bin_pixels: 1              # Set to True if we want to discard predictions based on if they have bin pixels
+  remove_bin_pixels: 0              # Set to True if we want to discard predictions based on if they have bin pixels
   bin_masks: semantic_masks        # Directory containing bin masks                                                                                                                                                                                                                         
   overlap_thresh: 0.5               # Overlap threshold
 
@@ -30,7 +30,7 @@ vis:
   # Prediction vis settings
   predictions: 1
   show_bbox_pred: 0
-  show_scores_pred: 0
+  show_scores_pred: 1
   show_class_pred: 1
 
   # GT vis settings

@@ -12,3 +12,6 @@ datasets/
 *.h5
 latim_dataset/
 dummy/
+*.png
+*.pny
+*.npy

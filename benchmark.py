@@ -147,7 +147,7 @@ def detect(run_dir, inference_config, model, dataset, bin_mask_dir=False, overla
     utils.mkdir_if_missing(pred_info_dir)
 
     # Create subdirectory for transformed GT segmasks
-    resized_segmask_dir = os.path.join(run_dir, 'modal_segmasks_processed')
+    resized_segmask_dir = os.path.join(run_dir, 'gt_annot')
     utils.mkdir_if_missing(resized_segmask_dir)
 
     # Feed images into model one by one. For each image, predict and save.

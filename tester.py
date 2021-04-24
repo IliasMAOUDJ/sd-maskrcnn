@@ -18,7 +18,6 @@ def gen_labels(path, scene, scene_number):
     for geometry in copy_node:
         if(geometry=="wall" or geometry=="floor" or "box" in geometry):
             continue
-        
         if("Femur" in geometry):
             labels.append(1)
         elif("Tibia" in geometry):
@@ -58,6 +57,8 @@ def gen_semantic_data(path, scene, scene_number,resolution=[512,512]):
         depth = trimesh.util.diagonal_dot(points - origins[0],
                                         vectors[index_ray])
 
+        if not np.any(depth):
+            print("depth is empty")
         # find pixel locations of actual hits
         pixel_ray = pixels[index_ray]
         # convert depth into 0 - 255 uint8
@@ -91,7 +92,7 @@ def gen_semantic_data(path, scene, scene_number,resolution=[512,512]):
     semantic_map = semantic_map.transpose(PIL.Image.FLIP_TOP_BOTTOM)
     file_name = dir_path+"image_%06d.png"%(scene_number)
     semantic_map.save(file_name)
-    return scene
+
 def gen_depth_image(path, scene, scene_number,resolution=[512,512]):
     # any of the automatically generated values can be overridden
     # set resolution, in pixels
@@ -118,7 +119,7 @@ def gen_depth_image(path, scene, scene_number,resolution=[512,512]):
 
     # create a numpy array we can turn into an image
     # doing it with uint8 creates an `L` mode greyscale image
-    a = np.zeros(scene.camera.resolution, dtype=np.uint8)
+    a = np.full(scene.camera.resolution, 255, dtype=np.uint8)
 
     # scale depth against range (0.0 - 1.0)
     depth_float = ((depth - depth.min()) / depth.ptp())
@@ -162,54 +163,8 @@ def rotz(t):
                      [s,  c,  0],
                      [0,  0,  1]])
 
-from shutil import rmtree
-if __name__ == '__main__':
-    print("---------  Generating dataset scenes----------------")
-    nb_samples=20
-    
-    train_inds = []
-    test_inds = []
-    total_pixels =[] #used for computing mean pixel
-    stats = {'Femur':0, 'Tibia': 0}
-    
-    TRAIN_TEST_SPLIT = 0.9
-
-    cam_trns= np.eye(4,4)
-    cam_trns[:3,3]=[0,0,1.5]
-    cam_trns[3,:]= [0,0,0,1]  
-    dataset_path = "./tester/"
-    if os.path.exists(dataset_path):
-        rmtree(dataset_path)
-    dataset_path+="images/"
-    os.makedirs(dataset_path)
-            
-    for i in range(nb_samples):
-        if i < int(nb_samples*TRAIN_TEST_SPLIT):
-            dir_path= './datasets/objects/meshes/latim_train/' #stl files     
-        else: 
-            dir_path= './datasets/objects/meshes/latim_test/'
-        onlyfiles = [f for f in listdir(dir_path) if isfile(join(dir_path, f))]
-        print("Generating %06d"%i)
-        #meshes = trimesh.Trimesh()
-
-        resolution=[512,512]
-        cam = trimesh.scene.Camera("cam", resolution=resolution, fov=[39,25])
-        scene = trimesh.Scene(camera=cam, camera_transform=cam_trns)      
-
-        M_rot_trans= np.eye(4,4)
-        M_rot_trans[:3,3]=[0,-0.6,0]
-        M_rot_trans[3,:]= [0,0,0,1]
-        floor = trimesh.creation.box([10,0.05,10], M_rot_trans)
-        scene.add_geometry(floor, geom_name="floor")
-
-        M_wall= np.eye(4,4)
-        M_wall[:3,3]=[0,4,-0.6]
-        M_wall[3,:]= [0,0,0,1]
-        wall = trimesh.creation.box([10,10,0.05], M_wall)
-        scene.add_geometry(wall, geom_name="wall")
-
-        rand = random.randrange(3,5)
-        for p in range(rand):
+def gen_scene(scene, dir_objects, list_objects, num_objects):
+    for p in range(num_objects):
             #Load random 3D model
             obj = random.choice(onlyfiles)
             pc= open(dir_path+'%s'%obj, 'r')
@@ -233,32 +188,82 @@ if __name__ == '__main__':
             geometry.apply_transform(M_rot_trans)
             #add the object to the scene
             scene.add_geometry(geometry, geom_name=name)
-            if "Femur" in name:
-                stats['Femur']+=1
-            elif "Tibia" in name:
-                stats['Tibia']+=1
-            if name in stats.keys():
-                stats[name]+=1
-            else:
-                stats[name]=1
 
-        random_objects= random.randrange(2,5)
-        for j in range(random_objects):
-            t =np.random.rand(1,3)
-            trans = (t-0.5)           
-            rot = Rotation.random().as_matrix()           
-            M= np.zeros((4,4))       # Translation and Rotation
-            M[:3,:3]=rot
-            M[:3,3]=trans
-            M[3,:]= [0,0,0,1]
-            obj = random.randint(1,2)
-            if(obj==1):         
-                geom = trimesh.creation.box(extents=[random.random()/2, random.random()/2, random.random()/2], transform=M)
-            elif(obj==2):
-                geom = trimesh.creation.cylinder(radius=random.random()/4, height= random.random()/3, transform=M)
-            scene.add_geometry(geom, geom_name="box_%d"%j)
+def gen_additional_objects(scene, num_objects):
+    for j in range(num_objects):
+        t =np.random.rand(1,3)
+        trans = (t-0.5)           
+        rot = Rotation.random().as_matrix()           
+        M= np.zeros((4,4))       # Translation and Rotation
+        M[:3,:3]=rot
+        M[:3,3]=trans
+        M[3,:]= [0,0,0,1]
+        obj = random.randint(1,2)
+        if(obj==1):         
+            geom = trimesh.creation.box(extents=[random.random()/2, random.random()/2, random.random()/2], transform=M)
+        elif(obj==2):
+            geom = trimesh.creation.cylinder(radius=random.random()/4, height= random.random()/3, transform=M)
+        scene.add_geometry(geom, geom_name="box_%d"%j)
 
-        scene = gen_semantic_data(dataset_path, scene, i, resolution)
+from shutil import rmtree
+if __name__ == '__main__':
+    print("---------  Generating dataset scenes----------------")
+    nb_samples=100
+    
+    train_inds = []
+    test_inds = []
+    total_pixels =[] #used for computing mean pixel
+    stats = {'Femur':0, 'Tibia': 0}
+    
+    TRAIN_TEST_SPLIT = 0.9
+
+    cam_trns= np.eye(4,4)
+    cam_trns[:3,3]=[0,0,1.5]
+    cam_trns[3,:]= [0,0,0,1]  
+    dataset_path = "./dummy/"
+    if os.path.exists(dataset_path):
+        rmtree(dataset_path)
+    dataset_path+="images/"
+    os.makedirs(dataset_path)
+            
+    for i in range(nb_samples):
+        if i < int(nb_samples*TRAIN_TEST_SPLIT):
+            dir_path= './datasets/objects/meshes/latim_train/' #stl files     
+        else: 
+            dir_path= './datasets/objects/meshes/latim_test/'
+        onlyfiles = [f for f in listdir(dir_path) if isfile(join(dir_path, f))]
+        print("Generating %06d"%i)
+        #meshes = trimesh.Trimesh()
+
+        resolution=[512,512]
+        cam = trimesh.scene.Camera("cam", resolution=resolution, fov=[39,25])
+        scene = trimesh.Scene(camera=cam, camera_transform=cam_trns)      
+        #M_rot_trans= np.eye(4,4)
+        #M_rot_trans[:3,3]=[0,-0.6,0]
+        #M_rot_trans[3,:]= [0,0,0,1]
+        #floor = trimesh.creation.box([10,0.05,10], M_rot_trans)
+        #scene.add_geometry(floor, geom_name="floor")
+
+        #M_wall= np.eye(4,4)
+        #M_wall[:3,3]=[0,4,-0.6]
+        #M_wall[3,:]= [0,0,0,1]
+        #wall = trimesh.creation.box([10,10,0.05], M_wall)
+        #scene.add_geometry(wall, geom_name="wall")
+        
+        gen_scene(scene, dir_path, onlyfiles, random.randrange(3,5))
+        for geometry in scene.geometry:
+            if "box" not in geometry:
+                if "Femur" in geometry:
+                    stats['Femur']+=1
+                elif "Tibia" in geometry:
+                    stats['Tibia']+=1
+                if geometry.split(':')[0] in stats.keys():
+                    stats[geometry.split(':')[0]]+=1
+                else:
+                    stats[geometry.split(':')[0]]=1
+
+        #gen_additional_objects(scene, random.randrange(2,4))
+        gen_semantic_data(dataset_path, scene, i, resolution)
         gen_labels(dataset_path, scene,i)
         pixels = gen_depth_image(dataset_path, scene,i,resolution)
 
@@ -278,3 +283,4 @@ if __name__ == '__main__':
         stats = collections.OrderedDict(sorted(stats.items()))
         for k, v in stats.items():
             print("%s: %s"%(k,v), file=f)
+        print("mean_pixel: %f"%(mean), file=f)

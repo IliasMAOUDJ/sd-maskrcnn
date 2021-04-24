@@ -70,12 +70,12 @@ class ImageDataset(Dataset):
         for i in self.image_id:
             if 'numpy' in self.images:
                 p = os.path.join(self.base_path, self.images,
-                                'image_{:06d}.npy'.format(i))
+                                '{:06d}.npy'.format(i))
             else:
                 p = os.path.join(self.base_path, self.images,
-                                'image_{:06d}.png'.format(i))
+                                '{:06d}.png'.format(i))
             labels = os.path.join(self.base_path, self.labels,
-                                'image_{:06d}.npy'.format(i))
+                                '{:06d}.npy'.format(i))
             self.add_image('latim', image_id=i, path=p, labels=labels)
 
             if augment:
@@ -129,7 +129,7 @@ class ImageDataset(Dataset):
         _image_id = info['id']
         Is = []
         file_name = os.path.join(self.base_path, self.masks,
-          'image_{:06d}.png'.format(_image_id))
+          '{:06d}.png'.format(_image_id))
 
         all_masks = skimage.io.imread(file_name)
         for i in np.arange(1,np.max(all_masks)+1):

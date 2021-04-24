@@ -1,0 +1,31 @@
+!!omap
+- model: !!omap
+  - path: models/
+  - weights: coco
+  - epochs:
+    - 30
+  - settings: !!omap
+    - name: dummy2
+    - image_shape:
+      - 512
+      - 512
+    - image_channel_count: 1
+    - mean_pixel:
+      - 237
+    - backbone: resnet50
+    - max_gt_instances: 8
+    - gpu_count: 1
+    - images_per_gpu: 1
+    - learning_rate:
+      - 0.001
+    - layers: heads
+    - image_min_dim: 512
+    - image_max_dim: 512
+- dataset: !!omap
+  - path: dummy/images/
+  - train_indices: train_indices.npy
+  - val_indices: test_indices.npy
+  - images: depth_ims
+  - masks: semantic_masks
+  - labels: labels
+- save_conf_name: dummy.yaml

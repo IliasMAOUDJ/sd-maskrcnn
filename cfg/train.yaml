@@ -1,23 +1,30 @@
 model:
   path: models/
   weights: new     # new, last, coco, imagenet or custom path
-  epochs: [3] #, 5, 7]      # number of epochs to train for
+  epochs: [30] #, 5, 7]      # number of epochs to train for
   settings:
-    name: test
+    name: dummy_new
     image_shape: [512,512]
     image_channel_count: 1
-    mean_pixel: [171] #, 128, 128]
+    mean_pixel: [237] #, 128, 128]
     backbone: resnet50
-    max_gt_instances: 8
+    max_gt_instances: 5
     gpu_count: 1
     images_per_gpu: 1
-    learning_rate: [0.01] #, 0.001,0.0001]
+    learning_rate: [0.002] #, 0.001,0.0001]
     layers: all
+    loss_weights: {
+        "rpn_class_loss": 5.,
+        "rpn_bbox_loss": 1.,
+        "mrcnn_class_loss": 5.,
+        "mrcnn_bbox_loss": 3.,
+        "mrcnn_mask_loss": 1.
+    }
 
 dataset:
-  path: tester/images/
+  path: /home/ilias-m/Documents/DATASETS/LATIM/dataset/
   train_indices: train_indices.npy
-  val_indices: test_indices.npy
+  val_indices: val_indices.npy
   images: depth_ims
   masks: semantic_masks
   labels: labels
@@ -25,4 +32,4 @@ dataset:
 # name of the config file to save (within the dataset folder)
 # note that this will be overwritten between multiple runs so
 # you should name this uniquely for each run.
-save_conf_name: multistep.yaml
+save_conf_name: dummy_weights.yaml
